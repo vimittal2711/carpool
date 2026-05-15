@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RideShare — Adobe Noida</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#1C6BF0;--brand-dk:#1557cc;--brand-soft:#EBF1FE;
+  --green:#16A34A;--green-soft:#F0FDF4;
+  --red:#E53E3E;--red-soft:#FFF5F5;
+  --amber:#D97706;--amber-soft:#FFFBEB;
+  --bg:#F7F8FC;--surface:#FFFFFF;--surface2:#F0F2F8;
+  --border:#E4E7F0;--text:#0F1526;--text2:#4A5270;--text3:#8C93B0;
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 2px 12px rgba(28,107,240,.08);
+  --shadow-lg:0 8px 32px rgba(28,107,240,.14);
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+.brand-name{font-weight:700;font-size:17px}
+.brand-sub{font-size:11px;color:var(--text3)}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:30px;padding:5px 12px 5px 5px;cursor:pointer;border:1px solid var(--border);transition:background .15s}
+.user-chip:hover{background:var(--brand-soft)}
+.user-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.user-name{font-size:13px;font-weight:500}
+
+/* TABS */
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 16px;gap:2px;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:14px 16px;font-size:14px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.tab-count{background:var(--brand-soft);color:var(--brand);font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center}
+.tab.active .tab-count{background:var(--brand);color:#fff}
+
+/* PAGES */
+.page{display:none;padding:20px;max-width:760px;margin:0 auto;animation:fadeUp .25s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:20px 0 10px}
+.sec:first-child{margin-top:0}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1C6BF0 0%,#0A3FA8 100%);border-radius:var(--radius);padding:22px 20px;margin-bottom:18px;color:#fff;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::after{content:'';position:absolute;right:50px;bottom:-40px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.hero-sub{font-size:13px;opacity:.8;margin-bottom:16px}
+.search-row{display:flex;gap:8px;position:relative;z-index:1}
+.search-input{flex:1;padding:11px 14px;border-radius:var(--radius-sm);border:none;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,.95);color:var(--text)}
+.search-input::placeholder{color:var(--text3)}
+.search-btn{padding:11px 18px;background:#fff;color:var(--brand);border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.search-btn:hover{opacity:.9}
+
+/* FILTER CHIPS */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto}
+.filter-row::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface);cursor:pointer;white-space:nowrap;transition:all .15s;color:var(--text2)}
+.chip:hover,.chip.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+
+/* RIDE CARD */
+.ride-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;transition:box-shadow .2s,border-color .2s;margin-bottom:10px}
+.ride-card:hover{box-shadow:var(--shadow);border-color:#c9d4f5}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.rc-driver{display:flex;align-items:center;gap:10px}
+.rc-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
+.rc-dname{font-weight:600;font-size:15px}
+.rc-drole{font-size:12px;color:var(--text3);margin-top:1px}
+.rc-rating{display:flex;align-items:center;gap:3px;font-size:12px;color:var(--amber);font-weight:600;margin-top:3px}
+.rc-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.badge-green{background:var(--green-soft);color:var(--green)}
+.badge-blue{background:var(--brand-soft);color:var(--brand)}
+.badge-amber{background:var(--amber-soft);color:var(--amber)}
+.badge-red{background:var(--red-soft);color:var(--red)}
+
+/* ROUTE */
+.route{display:flex;align-items:center;background:var(--surface2);border-radius:var(--radius-sm);padding:12px 16px;margin:14px 0}
+.route-from,.route-to{flex:1;min-width:0}
+.route-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}
+.route-place{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route-time{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text2);margin-top:2px}
+.route-arrow{padding:0 16px;color:var(--brand);font-size:20px;flex-shrink:0}
+.rc-meta{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--text2);margin-bottom:14px;flex-wrap:wrap}
+.rc-meta-item{display:flex;align-items:center;gap:5px}
+.rc-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:1px solid transparent;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-primary:hover{background:var(--brand-dk)}
+.btn-ghost{background:none;color:var(--text2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--surface2)}
+.btn-danger{background:none;color:var(--red);border-color:#fcc}
+.btn-danger:hover{background:var(--red-soft)}
+.btn-sm{padding:7px 14px;font-size:13px}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+/* FORM */
+.form-grid{display:grid;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:600;color:var(--text2)}
+.field input,.field select,.field textarea{padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
+.field textarea{resize:vertical;min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seats-ctrl{display:flex;align-items:center;gap:12px}
+.seat-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:18px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.seat-btn:hover{background:var(--brand-soft);border-color:var(--brand)}
+.seat-val{font-size:20px;font-weight:700;min-width:28px;text-align:center;color:var(--brand)}
+.seats-hint{font-size:12px;color:var(--text3)}
+
+/* TOGGLES */
+.pref-list{display:flex;flex-direction:column}
+.pref-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.pref-item:last-child{border-bottom:none}
+.pref-icon{font-size:18px;width:24px;text-align:center}
+.pref-label{flex:1;font-size:14px;font-weight:500}
+.pref-desc{font-size:12px;color:var(--text3);margin-top:1px}
+.toggle{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on{background:var(--brand)}.toggle.on::after{left:23px}
+.toggle.off{background:#CBD5E0}.toggle.off::after{left:3px}
+
+/* PROFILE */
+.profile-hero{background:linear-gradient(135deg,#1C6BF0,#0A3FA8);border-radius:var(--radius);padding:24px 20px;color:#fff;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.profile-av-lg{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.3);flex-shrink:0}
+.profile-name{font-size:20px;font-weight:700}
+.profile-role{font-size:13px;opacity:.8;margin-top:2px}
+.verified{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;font-size:11px;font-weight:600;padding:4px 10px;margin-top:8px}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 12px;text-align:center}
+.pstat-num{font-size:24px;font-weight:700;color:var(--brand)}
+.pstat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,21,38,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);transform:translateY(20px);transition:transform .2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-title{font-size:17px;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--surface2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.modal-close:hover{background:var(--border)}
+.modal-body{padding:20px}
+.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(15,21,38,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.confirm-overlay.open{opacity:1;pointer-events:all}
+.confirm-box{background:var(--surface);border-radius:var(--radius);padding:28px 24px;max-width:360px;width:100%;box-shadow:var(--shadow-lg);text-align:center}
+.confirm-icon{font-size:42px;margin-bottom:12px}
+.confirm-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.confirm-sub{font-size:14px;color:var(--text2);margin-bottom:20px}
+.confirm-btns{display:flex;gap:10px;justify-content:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* REQ ITEMS */
+.req-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.req-item:last-child{border-bottom:none}
+.req-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.req-info{flex:1;min-width:0}
+.req-name{font-weight:600;font-size:14px}
+.req-meta{font-size:12px;color:var(--text3);margin-top:1px}
+.req-actions{display:flex;gap:6px}
+
+@media(max-width:500px){
+  .field-row{grid-template-columns:1fr}
+  .profile-stats{grid-template-columns:1fr 1fr}
+  .rc-badges{justify-content:flex-start}
+  .route{flex-direction:column;gap:6px}
+  .route-arrow{transform:rotate(90deg);padding:4px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">RS</div>
+    <div>
+      <div class="brand-name">RideShare</div>
+      <div class="brand-sub">Adobe Noida</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-chip" onclick="switchTabByName('profile')">
+      <div class="user-av" id="nav-av" style="background:#1C6BF0">RS</div>
+      <span class="user-name" id="nav-name">Rahul S.</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('find',this)">🔍 Find Rides <span class="tab-count" id="count-find">0</span></button>
+  <button class="tab" onclick="switchTab('my',this)">🚗 My Rides <span class="tab-count" id="count-my">0</span></button>
+  <button class="tab" onclick="switchTab('requests',this)">📩 Requests <span class="tab-count" id="count-req">0</span></button>
+  <button class="tab" onclick="switchTab('profile',this)">👤 Profile</button>
+</div>
+
+<!-- FIND RIDES -->
+<div id="page-find" class="page active">
+  <div class="hero">
+    <div class="hero-title">Find your commute buddy 🚗</div>
+    <div class="hero-sub">Search rides by area, colleague, or time</div>
+    <div class="search-row">
+      <input class="search-input" id="search-input" type="text" placeholder="Area, name, or route…" oninput="renderFindRides()"/>
+      <button class="search-btn" onclick="renderFindRides()">Search</button>
+    </div>
+  </div>
+  <div class="filter-row">
+    <div class="chip active" onclick="setFilter('all',this)">All rides</div>
+    <div class="chip" onclick="setFilter('morning',this)">🌅 Morning</div>
+    <div class="chip" onclick="setFilter('evening',this)">🌆 Evening</div>
+    <div class="chip" onclick="setFilter('seats',this)">💺 Has seats</div>
+  </div>
+  <div id="find-rides-list"></div>
+</div>
+
+<!-- MY RIDES -->
+<div id="page-my" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div>
+      <div style="font-size:18px;font-weight:700">My rides</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:2px">Rides you've posted</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Offer ride</button>
+  </div>
+  <div id="my-rides-list"></div>
+</div>
+
+<!-- REQUESTS -->
+<div id="page-requests" class="page">
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px">Ride requests</div>
+  <div style="font-size:13px;color:var(--text3);margin-bottom:16px">People who want to join your rides</div>
+  <div id="requests-list"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="page-profile" class="page">
+  <div class="profile-hero">
+    <div class="profile-av-lg" id="prof-av" style="background:#1C6BF0">RS</div>
+    <div>
+      <div class="profile-name" id="prof-name">Rahul Sharma</div>
+      <div class="profile-role" id="prof-role">Senior Engineer · Noida</div>
+      <div class="verified">✔ Adobe verified employee</div>
+    </div>
+  </div>
+  <div class="profile-stats">
+    <div class="pstat"><div class="pstat-num" id="stat-offered">0</div><div class="pstat-lbl">Rides offered</div></div>
+    <div class="pstat"><div class="pstat-num" id="stat-taken">0</div><div class="pstat-lbl">Rides joined</div></div>
+    <div class="pstat"><div class="pstat-num" id="stat-co2">0kg</div><div class="pstat-lbl">CO₂ saved</div></div>
+  </div>
+  <div class="sec" style="margin-top:0">Edit profile</div>
+  <div class="card" style="padding:20px">
+    <div class="form-grid">
+      <div class="field-row">
+        <div class="field"><label>Full name</label><input id="pf-name" type="text" value="Rahul Sharma"/></div>
+        <div class="field"><label>Team / Role</label><input id="pf-role" type="text" value="Experience Cloud"/></div>
+      </div>
+      <div class="field"><label>Home area</label><input id="pf-area" type="text" value="Sector 18, Noida"/></div>
+      <div class="field"><label>Phone (for ride coordination)</label><input id="pf-phone" type="text" placeholder="+91 9800000000"/></div>
+      <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
+    </div>
+  </div>
+  <div class="sec">Ride preferences</div>
+  <div class="card" style="padding:16px 20px">
+    <div class="pref-list">
+      <div class="pref-item"><span class="pref-icon">🎵</span><div style="flex:1"><div class="pref-label">Music during ride</div><div class="pref-desc">Play music in the car</div></div><button class="toggle on" onclick="togglePref(this)"></button></div>
+      <div class="pref-item"><span class="pref-icon">🚭</span><div style="flex:1"><div class="pref-label">No smoking</div><div class="pref-desc">Non-smoking car only</div></div><button class="toggle on" onclick="togglePref(this)"></button></div>
+      <div class="pref-item"><span class="pref-icon">💬</span><div style="flex:1"><div class="pref-label">Chat during ride</div><div class="pref-desc">Open to conversation</div></div><button class="toggle off" onclick="togglePref(this)"></button></div>
+      <div class="pref-item"><span class="pref-icon">👩</span><div style="flex:1"><div class="pref-label">Women-only mode</div><div class="pref-desc">Match with women only</div></div><button class="toggle off" onclick="togglePref(this)"></button></div>
+      <div class="pref-item"><span class="pref-icon">🔔</span><div style="flex:1"><div class="pref-label">Ride notifications</div><div class="pref-desc">Alert on new requests</div></div><button class="toggle on" onclick="togglePref(this)"></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="ride-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Offer a ride</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Your pickup area</label><input id="f-from" type="text" placeholder="e.g. Sector 62, Noida"/></div>
+        <div class="field"><label>Destination</label><input id="f-to" type="text" value="Adobe India, Sector 25A, Noida"/></div>
+        <div class="field-row">
+          <div class="field"><label>Date</label><input id="f-date" type="date"/></div>
+          <div class="field"><label>Departure time</label><input id="f-time" type="time"/></div>
+        </div>
+        <div class="field">
+          <label>Available seats</label>
+          <div class="seats-ctrl">
+            <button class="seat-btn" onclick="changeSeat(-1)">−</button>
+            <div class="seat-val" id="seat-val">2</div>
+            <button class="seat-btn" onclick="changeSeat(1)">+</button>
+            <span class="seats-hint">passengers</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Ride type</label>
+          <select id="f-type">
+            <option value="daily">Daily commute (Mon–Fri)</option>
+            <option value="onetime">One-time ride</option>
+            <option value="weekly">Specific days</option>
+          </select>
+        </div>
+        <div class="field"><label>Car details (optional)</label><input id="f-car" type="text" placeholder="e.g. White Swift Dzire · DL 01 AB 1234"/></div>
+        <div class="field"><label>Notes for riders</label><textarea id="f-notes" placeholder="e.g. Will wait at the main gate, call when you arrive…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveRide()">Post ride</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Delete this ride?</div>
+    <div class="confirm-sub">This will remove your ride listing and cancel all pending requests.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Keep it</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA
+const RIDES_KEY='cp_rides_v3', REQS_KEY='cp_reqs_v3', PROF_KEY='cp_prof_v3';
+const load = k => { try{ return JSON.parse(localStorage.getItem(k))||[] }catch{ return [] } };
+const loadObj = k => { try{ return JSON.parse(localStorage.getItem(k))||null }catch{ return null } };
+const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+
+// ── COLORS / INITIALS
+const COLORS=['#1C6BF0','#16A34A','#D97706','#7C3AED','#DB2777','#0891B2','#DC2626','#059669'];
+const colorFor = s => { let h=0; for(let c of s) h=(h+c.charCodeAt(0))%COLORS.length; return COLORS[h]; };
+const initialsOf = s => s.trim().split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
+
+// ── DEFAULT PROFILE
+const defaultProfile = () => ({name:'Rahul Sharma',role:'Experience Cloud',area:'Sector 18, Noida',phone:''});
+
+// ── SEED DEMO RIDES
+function seedDemo(){
+  if(load(RIDES_KEY).length) return;
+  const nd = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
+  save(RIDES_KEY,[
+    {id:'d1',mine:false,driverName:'Priya Kapoor',driverRole:'Product Manager',from:'Sector 137, Noida',to:'Adobe India, Sector 25A, Noida',date:nd(1),time:'08:30',seats:3,takenSeats:1,type:'daily',car:'Silver Honda City · UP 16 XX 1234',notes:'Pick up near the metro gate. Call when here.',rating:4.9},
+    {id:'d2',mine:false,driverName:'Arjun Singh',driverRole:'UX Designer',from:'Indirapuram, Ghaziabad',to:'Adobe India, Sector 25A, Noida',date:nd(1),time:'08:15',seats:4,takenSeats:2,type:'daily',car:'White Brezza · DL 3C AB 5678',notes:'Near Shipra Mall gate.',rating:4.7},
+    {id:'d3',mine:false,driverName:'Sunita Patel',driverRole:'Engineering Manager',from:'Vaishali, Ghaziabad',to:'Adobe India, Sector 25A, Noida',date:nd(1),time:'08:45',seats:4,takenSeats:1,type:'weekly',car:'Black Creta · DL 7C YZ 9012',notes:'Flexible on pickup within Vaishali.',rating:5.0},
+    {id:'d4',mine:false,driverName:'Vikram Mehta',driverRole:'Senior Engineer',from:'Sector 50, Noida',to:'Adobe India, Sector 25A, Noida',date:nd(2),time:'09:00',seats:2,takenSeats:0,type:'onetime',car:'',notes:'',rating:4.6},
+  ]);
+}
+
+// ── STATE
+let currentFilter='all', editingId=null, deletingId=null, formSeats=2;
+
+// ── INIT
+seedDemo();
+renderAll();
+
+function renderAll(){
+  const p = loadObj(PROF_KEY)||defaultProfile();
+  applyProfile(p);
+  renderFindRides();
+  renderMyRides();
+  renderRequests();
+  updateCounts();
+}
+
+function applyProfile(p){
+  const ini=initialsOf(p.name), col=colorFor(p.name);
+  document.getElementById('nav-av').textContent=ini;
+  document.getElementById('nav-av').style.background=col;
+  const parts=p.name.trim().split(' ');
+  document.getElementById('nav-name').textContent=parts[0]+(parts[1]?' '+parts[1][0]+'.':'');
+  document.getElementById('prof-av').textContent=ini;
+  document.getElementById('prof-av').style.background=col;
+  document.getElementById('prof-name').textContent=p.name;
+  document.getElementById('prof-role').textContent=p.role+' · Noida';
+  document.getElementById('pf-name').value=p.name;
+  document.getElementById('pf-role').value=p.role;
+  document.getElementById('pf-area').value=p.area;
+  document.getElementById('pf-phone').value=p.phone||'';
+  const myR=load(RIDES_KEY).filter(r=>r.mine);
+  document.getElementById('stat-offered').textContent=myR.length;
+  document.getElementById('stat-taken').textContent=load(REQS_KEY).filter(r=>r.status==='accepted').length;
+  document.getElementById('stat-co2').textContent=(myR.length*2.4).toFixed(1)+'kg';
+}
+
+// ── FIND RIDES
+function renderFindRides(){
+  let list=load(RIDES_KEY).filter(r=>!r.mine);
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  if(q) list=list.filter(r=>r.from.toLowerCase().includes(q)||r.to.toLowerCase().includes(q)||r.driverName.toLowerCase().includes(q));
+  if(currentFilter==='morning') list=list.filter(r=>parseInt(r.time)<12);
+  if(currentFilter==='evening') list=list.filter(r=>parseInt(r.time)>=17);
+  if(currentFilter==='seats')   list=list.filter(r=>(r.seats-(r.takenSeats||0))>0);
+  const el=document.getElementById('find-rides-list');
+  el.innerHTML=list.length ? list.map(r=>rideCardHTML(r,false)).join('') :
+    `<div class="empty"><div class="empty-icon">🔎</div><div class="empty-title">No rides found</div><div class="empty-sub">Try a different search or filter</div></div>`;
+  updateCounts();
+}
+
+// ── MY RIDES
+function renderMyRides(){
+  const list=load(RIDES_KEY).filter(r=>r.mine);
+  const el=document.getElementById('my-rides-list');
+  el.innerHTML=list.length ? list.map(r=>rideCardHTML(r,true)).join('') :
+    `<div class="empty"><div class="empty-icon">🚗</div><div class="empty-title">No rides posted yet</div><div class="empty-sub">Tap "Offer ride" to post your first listing</div></div>`;
+  updateCounts();
+}
+
+// ── RIDE CARD HTML
+function rideCardHTML(r,isOwner){
+  const avBg=r.mine?(colorFor((loadObj(PROF_KEY)||defaultProfile()).name)):colorFor(r.driverName);
+  const avIn=initialsOf(r.driverName);
+  const left=r.seats-(r.takenSeats||0);
+  const seatsBadge=left<=0?'<span class="badge badge-red">Full</span>':`<span class="badge badge-green">${left} seat${left>1?'s':''} left</span>`;
+  const reqs=load(REQS_KEY).filter(q=>q.rideId===r.id&&q.status==='pending');
+  const reqB=isOwner&&reqs.length?`<span class="badge badge-amber">${reqs.length} request${reqs.length>1?'s':''}</span>`:'';
+  const typeL=r.type==='daily'?'Daily':r.type==='weekly'?'Weekly':'One-time';
+  const fd=r.date?new Date(r.date+'T12:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}):'';
+  const ft=r.time?fmtTime(r.time):'';
+  const stars='★'.repeat(Math.round(r.rating||5));
+  const actions=isOwner
+    ?`<button class="btn btn-ghost btn-sm" onclick="openEditModal('${r.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="openConfirmDelete('${r.id}')">🗑️ Delete</button>`
+    :`<button class="btn btn-primary btn-sm" onclick="requestRide('${r.id}')">Request seat</button><button class="btn btn-ghost btn-sm" onclick="showToast('📞 Contacting ${r.driverName}…')">Contact</button>`;
+  return `<div class="ride-card">
+    <div class="rc-top">
+      <div class="rc-driver">
+        <div class="rc-av" style="background:${avBg}">${avIn}</div>
+        <div>
+          <div class="rc-dname">${r.driverName}${r.mine?' <span style="font-size:11px;color:var(--brand);font-weight:500">(you)</span>':''}</div>
+          <div class="rc-drole">${r.driverRole||''}</div>
+          <div class="rc-rating">${stars} ${(r.rating||5).toFixed(1)}</div>
+        </div>
+      </div>
+      <div class="rc-badges">${seatsBadge}${reqB}<span class="badge badge-blue">${typeL}</span></div>
+    </div>
+    <div class="route">
+      <div class="route-from"><div class="route-label">From</div><div class="route-place">${r.from}</div><div class="route-time">${ft}</div></div>
+      <div class="route-arrow">→</div>
+      <div class="route-to"><div class="route-label">To</div><div class="route-place">${r.to}</div></div>
+    </div>
+    <div class="rc-meta">
+      <div class="rc-meta-item">📅 ${fd}</div>
+      <div class="rc-meta-item">💺 ${r.seats} seats total</div>
+      ${r.car?`<div class="rc-meta-item">🚘 ${r.car}</div>`:''}
+    </div>
+    ${r.notes?`<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px">💬 ${r.notes}</div>`:''}
+    <div class="rc-actions">${actions}</div>
+  </div>`;
+}
+
+// ── REQUESTS
+function renderRequests(){
+  const reqs=load(REQS_KEY), rides=load(RIDES_KEY);
+  const el=document.getElementById('requests-list');
+  if(!reqs.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📩</div><div class="empty-title">No requests yet</div><div class="empty-sub">When someone requests to join your ride, it'll appear here</div></div>`;
+    updateCounts(); return;
+  }
+  const pending=reqs.filter(r=>r.status==='pending');
+  const past=reqs.filter(r=>r.status!=='pending');
+  let html='';
+  if(pending.length){
+    html+=`<div class="sec" style="margin-top:0">Pending (${pending.length})</div><div class="card" style="padding:0 16px">`;
+    html+=pending.map(req=>{
+      const ride=rides.find(r=>r.id===req.rideId);
+      return `<div class="req-item">
+        <div class="req-av" style="background:${colorFor(req.name)}">${initialsOf(req.name)}</div>
+        <div class="req-info"><div class="req-name">${req.name}</div><div class="req-meta">${ride?`${ride.from} → ${ride.to}`:'Ride deleted'} · ${req.date||''}</div></div>
+        <div class="req-actions">
+          <button class="btn btn-primary btn-sm" onclick="handleReq('${req.id}','accepted')">Accept</button>
+          <button class="btn btn-ghost btn-sm" onclick="handleReq('${req.id}','declined')">Decline</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+  }
+  if(past.length){
+    html+=`<div class="sec">Past requests</div><div class="card" style="padding:0 16px">`;
+    html+=past.map(req=>`<div class="req-item">
+      <div class="req-av" style="background:${colorFor(req.name)}">${initialsOf(req.name)}</div>
+      <div class="req-info"><div class="req-name">${req.name}</div><div class="req-meta">${req.date||''}</div></div>
+      <span class="badge ${req.status==='accepted'?'badge-green':'badge-red'}">${req.status==='accepted'?'Accepted':'Declined'}</span>
+    </div>`).join('')+'</div>';
+  }
+  el.innerHTML=html; updateCounts();
+}
+
+function handleReq(id,status){
+  const reqs=load(REQS_KEY), req=reqs.find(r=>r.id===id);
+  if(!req) return;
+  req.status=status;
+  if(status==='accepted'){
+    const rides=load(RIDES_KEY), ride=rides.find(r=>r.id===req.rideId);
+    if(ride){ ride.takenSeats=(ride.takenSeats||0)+1; save(RIDES_KEY,rides); }
+  }
+  save(REQS_KEY,reqs);
+  showToast(status==='accepted'?`✅ Accepted ${req.name}'s request`:`❌ Declined ${req.name}'s request`);
+  renderAll();
+}
+
+function requestRide(rideId){
+  const p=loadObj(PROF_KEY)||defaultProfile();
+  const rides=load(RIDES_KEY), ride=rides.find(r=>r.id===rideId);
+  if(!ride) return;
+  if((ride.seats-(ride.takenSeats||0))<=0){ showToast('⚠️ This ride is full'); return; }
+  const reqs=load(REQS_KEY);
+  if(reqs.find(r=>r.rideId===rideId&&r.name===p.name)){ showToast('You already requested this ride'); return; }
+  reqs.push({id:'rq_'+Date.now(),rideId,name:p.name,date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}),status:'pending'});
+  save(REQS_KEY,reqs);
+  showToast(`📩 Request sent to ${ride.driverName}!`);
+  renderAll();
+}
+
+// ── ADD / EDIT MODAL
+function openAddModal(){
+  editingId=null; formSeats=2;
+  document.getElementById('modal-title').textContent='Offer a ride';
+  document.getElementById('modal-save-btn').textContent='Post ride';
+  document.getElementById('f-from').value='';
+  document.getElementById('f-to').value='Adobe India, Sector 25A, Noida';
+  const t=new Date(); t.setDate(t.getDate()+1);
+  document.getElementById('f-date').value=t.toISOString().split('T')[0];
+  document.getElementById('f-time').value='08:30';
+  document.getElementById('f-car').value='';
+  document.getElementById('f-notes').value='';
+  document.getElementById('f-type').value='daily';
+  document.getElementById('seat-val').textContent=2;
+  document.getElementById('ride-modal').classList.add('open');
+}
+
+function openEditModal(id){
+  const r=load(RIDES_KEY).find(r=>r.id===id); if(!r) return;
+  editingId=id; formSeats=r.seats;
+  document.getElementById('modal-title').textContent='Edit ride';
+  document.getElementById('modal-save-btn').textContent='Save changes';
+  document.getElementById('f-from').value=r.from;
+  document.getElementById('f-to').value=r.to;
+  document.getElementById('f-date').value=r.date;
+  document.getElementById('f-time').value=r.time;
+  document.getElementById('f-car').value=r.car||'';
+  document.getElementById('f-notes').value=r.notes||'';
+  document.getElementById('f-type').value=r.type||'daily';
+  document.getElementById('seat-val').textContent=formSeats;
+  document.getElementById('ride-modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('ride-modal').classList.remove('open'); }
+function closeModalOutside(e){ if(e.target.id==='ride-modal') closeModal(); }
+
+function saveRide(){
+  const from=document.getElementById('f-from').value.trim();
+  const to=document.getElementById('f-to').value.trim();
+  const date=document.getElementById('f-date').value;
+  const time=document.getElementById('f-time').value;
+  if(!from){ showToast('⚠️ Please enter your pickup area'); return; }
+  if(!date){ showToast('⚠️ Please pick a date'); return; }
+  if(!time){ showToast('⚠️ Please set a departure time'); return; }
+  const p=loadObj(PROF_KEY)||defaultProfile();
+  const rides=load(RIDES_KEY);
+  const extra={from,to,date,time,seats:formSeats,car:document.getElementById('f-car').value.trim(),notes:document.getElementById('f-notes').value.trim(),type:document.getElementById('f-type').value};
+  if(editingId){
+    const i=rides.findIndex(r=>r.id===editingId);
+    if(i>-1) rides[i]={...rides[i],...extra};
+    showToast('✅ Ride updated!');
+  } else {
+    rides.push({id:'r_'+Date.now(),mine:true,driverName:p.name,driverRole:p.role,takenSeats:0,rating:5.0,...extra});
+    showToast('🚗 Ride posted! Colleagues can now find it.');
+  }
+  save(RIDES_KEY,rides); closeModal(); renderAll();
+}
+
+// ── DELETE
+function openConfirmDelete(id){ deletingId=id; document.getElementById('confirm-overlay').classList.add('open'); }
+function closeConfirm(){ document.getElementById('confirm-overlay').classList.remove('open'); deletingId=null; }
+function confirmDelete(){
+  if(!deletingId) return;
+  save(RIDES_KEY, load(RIDES_KEY).filter(r=>r.id!==deletingId));
+  save(REQS_KEY,  load(REQS_KEY).filter(r=>r.rideId!==deletingId));
+  closeConfirm(); showToast('🗑️ Ride deleted'); renderAll();
+}
+
+// ── PROFILE SAVE
+function saveProfile(){
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name){ showToast('⚠️ Please enter your name'); return; }
+  const p={name,role:document.getElementById('pf-role').value.trim(),area:document.getElementById('pf-area').value.trim(),phone:document.getElementById('pf-phone').value.trim()};
+  save(PROF_KEY,p);
+  const rides=load(RIDES_KEY).map(r=>r.mine?{...r,driverName:p.name,driverRole:p.role}:r);
+  save(RIDES_KEY,rides);
+  showToast('✅ Profile saved!'); renderAll();
+}
+
+// ── HELPERS
+function changeSeat(d){ formSeats=Math.min(6,Math.max(1,formSeats+d)); document.getElementById('seat-val').textContent=formSeats; }
+
+function setFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderFindRides();
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchTabByName(name){
+  const btn=[...document.querySelectorAll('.tab')].find(t=>t.getAttribute('onclick')?.includes("'"+name+"'"));
+  if(btn) switchTab(name,btn);
+}
+
+function updateCounts(){
+  const rides=load(RIDES_KEY), reqs=load(REQS_KEY);
+  document.getElementById('count-find').textContent=rides.filter(r=>!r.mine).length;
+  document.getElementById('count-my').textContent=rides.filter(r=>r.mine).length;
+  const pend=reqs.filter(r=>r.status==='pending').length;
+  const reqCount=document.getElementById('count-req');
+  reqCount.textContent=pend;
+  reqCount.style.background=pend?'var(--amber)':'';
+  reqCount.style.color=pend?'#fff':'';
+}
+
+function fmtTime(t){ const[h,m]=t.split(':').map(Number); return `${h%12||12}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`; }
+function togglePref(btn){ btn.classList.toggle('on'); btn.classList.toggle('off'); showToast('Preference updated'); }
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
